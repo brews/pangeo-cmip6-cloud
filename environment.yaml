@@ -1,0 +1,26 @@
+# Removed many of the packages originally listed. Reduces container image from ~8GB to ~700MB.
+name: base
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - cftime
+  - dask
+  - distributed
+  - intake
+  - intake-xarray
+  - kerchunk>=0.0.6
+  - h5py>=3.3.0
+  - fsspec>=2022.1.0
+  - gcsfs>=2022.1.0
+  - netcdf4
+  - numcodecs
+  - pandas
+  # - pangeo-forge-recipes
+  - pip
+  - prefect=1.2.0
+  - requests
+  - xarray>=0.18.0
+  - zarr>=2.6.0
+  - pip:
+    - pangeo-forge-recipes==0.8.3
