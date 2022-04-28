@@ -55,10 +55,10 @@ spec:
           - "{{ inputs.parameters.outzarr }}"
         resources:
           requests:
-            memory: 4Gi
+            memory: 8Gi
             cpu: "100m"
           limits:
-            memory: 4Gi
+            memory: 8Gi
             cpu: "2000m"
       retryStrategy:
         limit: 2
