@@ -1,0 +1,69 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: esgf2zarr-
+spec:
+  entrypoint: zarrfromesgf
+  arguments:
+    parameters:
+      - name: activity-id
+        value: DAMIP
+      - name: institution-id
+        value: CSIRO
+      - name: source-id
+        value: ACCESS-ESM1-5
+      - name: experiment-id
+        value: hist-nat
+      - name: member-id
+        value: r1i1p1f1
+      - name: table-id
+        value: day
+      - name: variable-id
+        value: tasmax
+      - name: grid-label
+        value: gn
+      - name: version
+        value: "20200615"
+  templates:
+
+    - name: zarrfromesgf
+      inputs:
+        parameters:
+          - name: project
+            value: "CMIP6"
+          - name: activity-id
+          - name: institution-id
+          - name: source-id
+          - name: experiment-id
+          - name: member-id
+          - name: table-id
+          - name: variable-id
+          - name: grid-label
+          - name: version
+          - name: outzarr
+            # An fsspec URL is allowed here.
+            value: "/tmp/output.zarr"
+      container:
+        image: us-central1-docker.pkg.dev/downscalecmip6/private/zarrfromesgf:dev
+        env:
+          # Prune is useful for testing runs
+          - name: ZARRFROMESGF_PRUNE
+            value: "FALSE"
+        command: ["/usr/local/bin/_entrypoint.sh", "python", "/opt/src/zarr_from_esgf.py"]
+        args:
+          - "{{inputs.parameters.project}}.{{inputs.parameters.activity-id}}.{{inputs.parameters.institution-id}}.{{inputs.parameters.source-id}}.{{inputs.parameters.experiment-id}}.{{inputs.parameters.member-id}}.{{inputs.parameters.table-id}}.{{inputs.parameters.variable-id}}.{{inputs.parameters.grid-label}}.v{{inputs.parameters.version}}"
+          - "{{ inputs.parameters.outzarr }}"
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: "100m"
+          limits:
+            memory: 4Gi
+            cpu: "2000m"
+      retryStrategy:
+        limit: 2
+        retryPolicy: "Always"
+        backoff:
+          duration: 120s
+          factor: 3
+      activeDeadlineSeconds: 18000
